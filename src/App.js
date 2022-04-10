@@ -1,7 +1,7 @@
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import app from './firbase.init';
 import { Button, Form } from 'react-bootstrap';
 import {useState} from 'react'
@@ -44,17 +44,22 @@ function App() {
     .then(result =>{
       const user = result.user;
       console.log(user)
+      setEmail('');
+      setPass('');
+      verifyEmail();
     })
     .catch(error =>{
       console.error(error)
       setError(error.message)
     })
-
     }
-
-
-    
     e.preventDefault()
+  }
+  const verifyEmail =()=>{
+    sendEmailVerification(auth.currentUser)
+    .then(()=>{
+      console.log("verification Send")
+    })
   }
   const handleRegisterChange = e =>{
     setRegister(e.target.checked)
@@ -64,6 +69,16 @@ function App() {
   }
   const handlePassBlur = e=>{
     setPass(e.target.value)
+  }
+  const handlePassReset = ()=>{
+    sendPasswordResetEmail(auth, email)
+  .then(() => {
+
+  })
+  .catch((error) => {
+    setError(error.message)
+  });
+
   }
   return (
     <div className="container w-50 mt-5">
@@ -93,6 +108,9 @@ function App() {
         <p className='text-danger'>{error}</p>
         <Button  variant="primary" type="submit">
           {registered? 'Login':'Register'}
+        </Button>
+        <Button  variant="danger" type="submit" onClick={handlePassReset}>
+          Reset Password
         </Button>
       </Form>
 
